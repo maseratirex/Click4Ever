@@ -1,4 +1,4 @@
-package process;
+package controller;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
@@ -8,56 +8,39 @@ import listeners.HoldMouseListener;
 import listeners.ToggleKeyListener;
 import listeners.ToggleMouseListener;
 import model.AutoClickerConfiguration;
+import process.KeyTyperRunner;
+import process.MouseClickerRunner;
 
-import java.awt.*;
 import java.util.EventListener;
 
 public class AutoClickerProcess {
     private EventListener eventListener;
-    private boolean isRunning = false;
+    private boolean running = false;
+    private Runnable runner;
 
     public void start() {
-        if(isRunning) {
+        if(running) {
             return;
         }
-        isRunning = true;
-        Thread thread = new Thread(){
-            public void run() {
-                Robot robot;
-                try {
-                    robot = new Robot();
-                } catch (AWTException e) {
-                    throw new RuntimeException(e);
-                }
-                while(isRunning) {
-                    System.out.println("Iteration begun");
-                    //point = MouseInfo.getPointerInfo().getLocation();
-                    //robot.mouseMove(point.x, point.y);
-                    robot.mousePress(16);
-                    robot.mouseRelease(16);
-                    System.out.println("Clicked");
-                    try {
-                        sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        };
+        running = true;
+        Thread thread = new Thread(runner);
         thread.start();
     }
     public void stop() {
-        isRunning = false;
+        running = false;
     }
     public void toggle() {
-        if(isRunning) {
+        if(running) {
             stop();
         } else {
             start();
         }
     }
+    public boolean isRunning() {
+        return running;
+    }
 
-    public void configure(AutoClickerConfiguration autoClickerConfiguration) {
+    public void configure(AutoClickerConfiguration configuration) {
         //First remove any existing event listener
         if(eventListener != null) {
             if(eventListener instanceof NativeKeyListener) {
@@ -69,22 +52,32 @@ public class AutoClickerProcess {
             }
         }
         //Then add new event listener
-        if(autoClickerConfiguration.getInputDevice().equals(AutoClickerConfiguration.TYPE_KEYBOARD)) {
-            if(autoClickerConfiguration.getActivationType().equals(AutoClickerConfiguration.TYPE_HOLD)) {
-                GlobalScreen.addNativeKeyListener(new HoldKeyListener(this, autoClickerConfiguration.getInputCode()));
-                System.out.println("Added hold key listener for " + autoClickerConfiguration.getInputCode());
-            } else if(autoClickerConfiguration.getActivationType().equals(AutoClickerConfiguration.TYPE_TOGGLE)){
-                GlobalScreen.addNativeKeyListener(new ToggleKeyListener(this, autoClickerConfiguration.getInputCode()));
+        if(configuration.getInputDevice().equals(AutoClickerConfiguration.TYPE_KEYBOARD)) {
+            if(configuration.getActivationType().equals(AutoClickerConfiguration.TYPE_HOLD)) {
+                eventListener = new HoldKeyListener(this, configuration.getInputCode());
+                GlobalScreen.addNativeKeyListener((NativeKeyListener) eventListener);
+                System.out.println("Added hold key listener for " + configuration.getInputCode());
+            } else if(configuration.getActivationType().equals(AutoClickerConfiguration.TYPE_TOGGLE)){
+                eventListener = new ToggleKeyListener(this, configuration.getInputCode());
+                GlobalScreen.addNativeKeyListener((NativeKeyListener) eventListener);
                 System.out.println("Added toggle key listener");
             }
-        } else if(autoClickerConfiguration.getInputDevice().equals(AutoClickerConfiguration.TYPE_MOUSE)){
-            if(autoClickerConfiguration.getActivationType().equals(AutoClickerConfiguration.TYPE_HOLD)) {
-                GlobalScreen.addNativeMouseListener(new HoldMouseListener(this, autoClickerConfiguration.getInputCode()));
+        } else if(configuration.getInputDevice().equals(AutoClickerConfiguration.TYPE_MOUSE)){
+            if(configuration.getActivationType().equals(AutoClickerConfiguration.TYPE_HOLD)) {
+                eventListener = new HoldMouseListener(this, configuration.getInputCode());
+                GlobalScreen.addNativeMouseListener((NativeMouseListener) eventListener);
                 System.out.println("Added hold mouse listener");
-            } else if(autoClickerConfiguration.getActivationType().equals(AutoClickerConfiguration.TYPE_TOGGLE)){
-                GlobalScreen.addNativeMouseListener(new ToggleMouseListener(this, autoClickerConfiguration.getInputCode()));
+            } else if(configuration.getActivationType().equals(AutoClickerConfiguration.TYPE_TOGGLE)){
+                eventListener = new ToggleMouseListener(this, configuration.getInputCode());
+                GlobalScreen.addNativeMouseListener((NativeMouseListener) eventListener);
                 System.out.println("Added toggle mouse listener");
             }
+        }
+        //Now specify which output device to press: click mouse button or type key
+        if(configuration.getOutputDevice().equals(AutoClickerConfiguration.TYPE_MOUSE)) {
+            runner = new MouseClickerRunner(this, configuration.getOutputCode(), configuration.getMinCPS(), configuration.getMaxCPS());
+        } else if(configuration.getOutputDevice().equals(AutoClickerConfiguration.TYPE_KEYBOARD)) {
+            runner = new KeyTyperRunner(this, configuration.getOutputCode(), configuration.getMinCPS(), configuration.getMaxCPS());
         }
     }
 }
