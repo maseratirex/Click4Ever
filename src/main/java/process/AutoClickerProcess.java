@@ -1,4 +1,4 @@
-package controller;
+package process;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;

@@ -1,21 +1,27 @@
 package model;
-public class AutoClickerConfiguration {
+
+import java.io.Serializable;
+
+public class AutoClickerConfiguration implements Serializable {
     public static final String TYPE_MOUSE = "Mouse";
     public static final String TYPE_KEYBOARD = "Keyboard";
     public static final String TYPE_HOLD = "Hold";
     public static final String TYPE_TOGGLE = "Toggle";
 
-    private int inputCode; //mouse button code or key code
-    private String inputDevice; //mouse/keyboard
-    private String activationType; //hold/toggle
-    private double minCPS = 8;
+    private final int inputCode; //mouse button code or key code
+    private final String inputDevice; //mouse/keyboard
+    private final int outputCode; //mouse button code or key code
+    private final String outputDevice; //mouse/keyboard
+    private final String activationType; //hold/toggle
+    private final int minCPS;
 
-    private double maxCPS = 12;
-    private String name = "Unnamed";
+    private final int maxCPS;
 
-    public AutoClickerConfiguration(int inputCode, String inputDevice, String activationType, double minCPS, double maxCPS, String name) {
+    public AutoClickerConfiguration(int inputCode, String inputDevice, int outputCode, String outputDevice, String activationType, int minCPS, int maxCPS) {
         this.inputCode = inputCode;
+        this.outputCode = outputCode;
         this.inputDevice = inputDevice;
+        this.outputDevice = outputDevice;
         this.activationType = activationType;
         this.minCPS = minCPS;
         this.maxCPS = maxCPS;
@@ -29,19 +35,23 @@ public class AutoClickerConfiguration {
         return inputDevice;
     }
 
+    public int getOutputCode() {
+        return outputCode;
+    }
+
+    public String getOutputDevice() {
+        return outputDevice;
+    }
+
     public String getActivationType() {
         return activationType;
     }
 
-    public double getMinCPS() {
+    public int getMinCPS() {
         return minCPS;
     }
 
-    public double getMaxCPS() {
+    public int getMaxCPS() {
         return maxCPS;
-    }
-
-    public String getName() {
-        return name;
     }
 }

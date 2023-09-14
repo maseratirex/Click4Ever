@@ -5,12 +5,12 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import process.AutoClickerProcess;
 
 public class HoldKeyListener implements NativeKeyListener {
-    private AutoClickerProcess autoClickerProcess;
-    private Integer inputKey; //the input that activates the corresponding auto clicker
+    private final AutoClickerProcess autoClickerProcess;
+    private final int inputCode;
 
-    public HoldKeyListener(AutoClickerProcess autoClickerProcess, Integer inputKey) {
+    public HoldKeyListener(AutoClickerProcess autoClickerProcess, int inputCode) {
         this.autoClickerProcess = autoClickerProcess;
-        this.inputKey = inputKey;
+        this.inputCode = inputCode;
     }
 
     @Override
@@ -20,16 +20,14 @@ public class HoldKeyListener implements NativeKeyListener {
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
-        //should start the auto clicker logic
-        if(nativeEvent.getKeyCode() == inputKey) {
+        if(nativeEvent.getKeyCode() == inputCode) {
             autoClickerProcess.start();
         }
     }
 
     @Override
     public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
-        //should stop the auto clicker logic
-        if(nativeEvent.getKeyCode() == inputKey) {
+        if(nativeEvent.getKeyCode() == inputCode) {
             autoClickerProcess.stop();
         }
     }

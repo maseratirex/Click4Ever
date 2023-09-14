@@ -1,9 +1,16 @@
 package view;
 
-import controller.AutoClickerController;
+import model.AutoClickerConfiguration;
+import process.AutoClickerProcess;
 
-public class AutoClickerView {
-    public AutoClickerView(AutoClickerController controller) {
-        //if click on any of the components to set, call controller.set for the value
+import javax.swing.*;
+
+public class AutoClickerView extends JPanel {
+    private final AutoClickerProcess autoClickerProcess;
+    public AutoClickerView(AutoClickerConfiguration configuration) {
+        autoClickerProcess = new AutoClickerProcess();
+        autoClickerProcess.configure(configuration);
+        JLabel placeholderLabel = new JLabel("Placeholder");
+        add(placeholderLabel);
     }
 }

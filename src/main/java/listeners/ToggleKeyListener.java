@@ -5,14 +5,12 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import process.AutoClickerProcess;
 
 public class ToggleKeyListener implements NativeKeyListener {
-    private AutoClickerProcess autoClickerProcess;
-    private Integer inputKey; //the input that activates the corresponding auto clicker
+    private final AutoClickerProcess autoClickerProcess;
+    private final int inputCode;
 
-    public ToggleKeyListener(AutoClickerProcess autoClickerProcess, Integer inputKey) {
+    public ToggleKeyListener(AutoClickerProcess autoClickerProcess, int inputCode) {
         this.autoClickerProcess = autoClickerProcess;
-        this.inputKey = inputKey;
-        //needs to start and stop the auto clicker
-        //needs to know which input to look out for with setter methods to change it
+        this.inputCode = inputCode;
     }
 
     @Override
@@ -27,6 +25,8 @@ public class ToggleKeyListener implements NativeKeyListener {
 
     @Override
     public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
-        //should toggle the auto clicker logic
+        if(nativeEvent.getKeyCode() == inputCode) {
+            autoClickerProcess.toggle();
+        }
     }
 }
