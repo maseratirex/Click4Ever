@@ -8,10 +8,10 @@ import listeners.HoldMouseListener;
 import listeners.ToggleKeyListener;
 import listeners.ToggleMouseListener;
 import model.AutoClickerConfiguration;
-import process.KeyTyperRunner;
-import process.MouseClickerRunner;
 
+import java.awt.*;
 import java.util.EventListener;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class AutoClickerProcess {
     private EventListener eventListener;
@@ -36,10 +36,6 @@ public class AutoClickerProcess {
             start();
         }
     }
-    public boolean isRunning() {
-        return running;
-    }
-
     public void configure(AutoClickerConfiguration configuration) {
         //First remove any existing event listener
         if(eventListener != null) {
@@ -75,9 +71,71 @@ public class AutoClickerProcess {
         }
         //Now specify which output device to press: click mouse button or type key
         if(configuration.getOutputDevice().equals(AutoClickerConfiguration.TYPE_MOUSE)) {
-            runner = new MouseClickerRunner(this, configuration.getOutputCode(), configuration.getMinCPS(), configuration.getMaxCPS());
+            runner = new MouseClickerRunner(configuration.getOutputCode(), configuration.getMinCPS(), configuration.getMaxCPS());
         } else if(configuration.getOutputDevice().equals(AutoClickerConfiguration.TYPE_KEYBOARD)) {
-            runner = new KeyTyperRunner(this, configuration.getOutputCode(), configuration.getMinCPS(), configuration.getMaxCPS());
+            runner = new KeyTyperRunner(configuration.getOutputCode(), configuration.getMinCPS(), configuration.getMaxCPS());
+        }
+    }
+    private class MouseClickerRunner implements Runnable {
+        private final int outputCode;
+        private final int minCPS;
+        private final int maxCPS;
+
+        public MouseClickerRunner(int outputCode, int minCPS, int maxCPS) {
+            this.outputCode = outputCode;
+            this.minCPS = minCPS;
+            this.maxCPS = maxCPS;
+        }
+
+        @Override
+        public void run() {
+            Robot robot;
+            try {
+                robot = new Robot();
+            } catch (AWTException exc) {
+                throw new RuntimeException(exc);
+            }
+            while(running) {
+                robot.mousePress(outputCode);
+                robot.mouseRelease(outputCode);
+                System.out.println("CLICKED");
+                try {
+                    Thread.sleep(1000/ThreadLocalRandom.current().nextInt(minCPS, maxCPS));
+                } catch (InterruptedException exc) {
+                    throw new RuntimeException(exc);
+                }
+            }
+        }
+    }
+    private class KeyTyperRunner implements Runnable {
+        private final int outputCode;
+        private final int minCPS;
+        private final int maxCPS;
+
+        public KeyTyperRunner(int outputCode, int minCPS, int maxCPS) {
+            this.outputCode = outputCode;
+            this.minCPS = minCPS;
+            this.maxCPS = maxCPS;
+        }
+
+        @Override
+        public void run() {
+            Robot robot;
+            try {
+                robot = new Robot();
+            } catch (AWTException exc) {
+                throw new RuntimeException(exc);
+            }
+            while(running) {
+                robot.keyPress(outputCode);
+                robot.keyRelease(outputCode);
+                System.out.println("TYPED");
+                try {
+                    Thread.sleep(1000/ ThreadLocalRandom.current().nextInt(minCPS, maxCPS));
+                } catch (InterruptedException exc) {
+                    throw new RuntimeException(exc);
+                }
+            }
         }
     }
 }
