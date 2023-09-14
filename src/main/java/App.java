@@ -1,3 +1,4 @@
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
@@ -13,13 +14,25 @@ import java.util.HashMap;
 public class App {
     private static HashMap<String, AutoClickerConfiguration> configurations; //key: name of auto clicker; value: config for auto clicker
     private static JTabbedPane tabbedPane;
-    private static void createAndShowGUI() {
-        JFrame window = new JFrame("Click4Ever");
-        window.addWindowListener(new MainWindowListener());
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setLayout(new BorderLayout());
-        window.setSize(300, 450);
+    public static void main(String[] args) {
+        if(System.getProperty("os.name").toLowerCase().contains("mac")){
+            System.out.println("macOS");
+            System.setProperty( "apple.awt.application.appearance", "system" ); //Header bar will be dark/light based on macOS theme
+            System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS"); //So that Command-Q properly closes app
+            System.setProperty( "apple.awt.application.name", "Click4Ever" );
+        } else {
+            System.out.println("Windows");
+        }
+        FlatDarkLaf.setup(); //FIXME eventually choose dark/light mode based on OS system setting
 
+        loadConfigurations();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                createAndShowGUI();
+            }
+        });
+    }
+    private static void loadConfigurations() {
         System.out.println("Loading configurations");
         try {
             FileInputStream fis = new FileInputStream("src/main/resources/config.txt");
@@ -30,12 +43,19 @@ public class App {
             System.err.println("Could not load configurations");
             configurations = new HashMap<>();
         }
+    }
+    private static void createAndShowGUI() {
+        JFrame window = new JFrame("Click4Ever");
+        window.addWindowListener(new MainWindowListener());
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setLayout(new BorderLayout());
+        window.setSize(300, 450);
 
+        //Display tab pane and tabs
         tabbedPane = new JTabbedPane();
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT); //Allows you to scroll through AutoClicker tabs
         tabbedPane.setFocusable(false);
 
-        //Display each tab
         for(HashMap.Entry<String, AutoClickerConfiguration> configurationEntry : configurations.entrySet()) {
             String autoClickerName = configurationEntry.getKey();
             AutoClickerConfiguration configuration = configurationEntry.getValue();
@@ -43,7 +63,7 @@ public class App {
         }
         window.add(tabbedPane);
 
-        //Menu bar (situated outside content pane) for Add and Delete Auto Clickers
+        //Menu bar for add and delete Auto Clickers
         JMenuBar menuBar = new JMenuBar();
         JButton addNewAutoClickerButton = new JButton("Add new auto clicker");
         addNewAutoClickerButton.addActionListener(new AddNewAutoClickerListener());
@@ -52,20 +72,9 @@ public class App {
         menuBar.add(addNewAutoClickerButton);
         menuBar.add(deleteAutoClickerButton);
         window.setJMenuBar(menuBar);
+
         //Display the window.
         window.setVisible(true);
-    }
-    public static void main(String[] args) {
-        if(System.getProperty("os.name").toLowerCase().contains("mac")){
-            System.out.println("Mac OS");
-            System.setProperty( "apple.awt.application.appearance", "system" ); //Header bar will be dark/light based on macOS theme
-            System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS"); //So that Command-Q properly closes app
-        }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
     }
     private static class AddNewAutoClickerListener implements ActionListener {
         @Override

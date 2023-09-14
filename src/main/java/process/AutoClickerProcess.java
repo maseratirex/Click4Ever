@@ -89,6 +89,11 @@ public class AutoClickerProcess {
 
         @Override
         public void run() {
+            /**
+             * TODO test on Windows
+             * FIXME speed up on Mac
+             * FIXME teleporting cursor issue on Mac
+             */
             Robot robot;
             try {
                 robot = new Robot();

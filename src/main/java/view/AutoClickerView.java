@@ -12,5 +12,9 @@ public class AutoClickerView extends JPanel {
         autoClickerProcess.configure(configuration);
         JLabel placeholderLabel = new JLabel("Placeholder");
         add(placeholderLabel);
+        /**
+         * TODO add GUI components to set AutoClickerConfiguration
+         * TODO create method to publish AutoClickerConfiguration to AutoClickerProcess
+         */
     }
 }
