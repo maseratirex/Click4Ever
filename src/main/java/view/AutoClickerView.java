@@ -17,4 +17,7 @@ public class AutoClickerView extends JPanel {
          * TODO create method to publish AutoClickerConfiguration to AutoClickerProcess
          */
     }
+    public void killAutoClicker() {
+        autoClickerProcess.kill();
+    }
 }

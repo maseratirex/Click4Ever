@@ -36,6 +36,20 @@ public class AutoClickerProcess {
             start();
         }
     }
+    public void kill() {
+        running = false;
+        runner = null;
+        if(eventListener != null) {
+            if(eventListener instanceof NativeKeyListener) {
+                GlobalScreen.removeNativeKeyListener((NativeKeyListener) eventListener);
+                System.out.println("Removed key listener");
+            } else {
+                GlobalScreen.removeNativeMouseListener((NativeMouseListener) eventListener);
+                System.out.println("Removed mouse listener");
+            }
+        }
+        System.out.println("Killed process");
+    }
     public void configure(AutoClickerConfiguration configuration) {
         //First remove any existing event listener
         if(eventListener != null) {

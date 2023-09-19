@@ -15,6 +15,11 @@ public class App {
     private static HashMap<String, AutoClickerConfiguration> configurations; //key: name of auto clicker; value: config for auto clicker
     private static JTabbedPane tabbedPane;
     public static void main(String[] args) {
+        /**
+         * TODO clean up Exception handling/logging
+         * TODO handle case where cursor is over the window (should prevent auto clickers from being active)
+         * TODO configurations shouldn't share the same input keys?
+         */
         if(System.getProperty("os.name").toLowerCase().contains("mac")){
             System.out.println("macOS");
             System.setProperty( "apple.awt.application.appearance", "system" ); //Header bar will be dark/light based on macOS theme
@@ -101,13 +106,14 @@ public class App {
                     1000
             );
             configurations.put(autoClickerName, defaultConfiguration);
+            System.out.println("Added Auto Clicker configuration");
             tabbedPane.addTab(autoClickerName, new AutoClickerView(defaultConfiguration));
+            System.out.println("Added Auto Clicker view");
         }
     }
     private static class DeleteAutoClickerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Deleting auto clicker");
             Object[] possibleNames = configurations.keySet().toArray();
             if(possibleNames.length == 0) { //no auto clicker to delete
                 JOptionPane.showMessageDialog(null, "No Auto Clicker to delete", "Error", JOptionPane.ERROR_MESSAGE);
@@ -126,8 +132,12 @@ public class App {
                 return;
             }
             int indexToDelete = tabbedPane.indexOfTab(autoClickerName);
+            AutoClickerView view = (AutoClickerView) tabbedPane.getComponentAt(indexToDelete);
+            view.killAutoClicker();
             tabbedPane.remove(indexToDelete);
+            System.out.println("Deleted Auto Clicker view");
             configurations.remove(autoClickerName);
+            System.out.println("Deleted Auto Clicker configuration");
         }
     }
     private static class MainWindowListener extends WindowAdapter {
