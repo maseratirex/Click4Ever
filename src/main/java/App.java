@@ -16,7 +16,7 @@ public class App {
     public static void main(String[] args) {
         /**
          * TODO clean up Exception handling/logging (exc.printStrackTrace)
-         * TODO handle case where cursor is over the window (should prevent auto clickers from being active)
+         * TODO let user know when window is focused, meaning they can't simulate output
          * TODO configurations shouldn't share the same input keys?
          */
         if(System.getProperty("os.name").toLowerCase().contains("mac")){
@@ -31,7 +31,7 @@ public class App {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                MainView.createAndShowGUI();
+                MainView.getInstance().createAndShowGUI();
             }
         });
     }

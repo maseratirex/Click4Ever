@@ -10,11 +10,16 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class MainView {
-    public static boolean isWindowFocused;
-    private static final MainModel mainModel = MainModel.getInstance();
+    private static MainView instance = new MainView();
+    private boolean windowFocused;
+    private final MainModel mainModel = MainModel.getInstance();
 ;
-    private static final JTabbedPane tabbedPane = new JTabbedPane();
-    public static void createAndShowGUI() {
+    private final JTabbedPane tabbedPane = new JTabbedPane();
+    private MainView() {}
+    public static MainView getInstance() {
+        return instance;
+    }
+    public void createAndShowGUI() {
         JFrame window = new JFrame("Click4Ever");
         window.addWindowListener(new MainWindowListener());
         window.addWindowFocusListener(new MainWindowListener());
@@ -45,7 +50,12 @@ public class MainView {
         //Display the window.
         window.setVisible(true);
     }
-    private static class AddNewAutoClickerListener implements ActionListener {
+
+    public boolean isWindowFocused() {
+        return windowFocused;
+    }
+
+    private class AddNewAutoClickerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             //Prompt user for Auto Clicker's name until valid
@@ -66,7 +76,7 @@ public class MainView {
             System.out.println("Added Auto Clicker view");
         }
     }
-    private static class DeleteAutoClickerListener implements ActionListener {
+    private class DeleteAutoClickerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             Object[] possibleNames = mainModel.getAutoClickerNames().toArray();
@@ -95,17 +105,17 @@ public class MainView {
             System.out.println("Deleted Auto Clicker configuration");
         }
     }
-    private static class MainWindowListener extends WindowAdapter {
+    private class MainWindowListener extends WindowAdapter {
         @Override
         public void windowGainedFocus(WindowEvent e) {
             System.out.println("Window focused");
-            isWindowFocused = true;
+            windowFocused = true;
         }
 
         @Override
         public void windowLostFocus(WindowEvent e) {
             System.out.println("Window unfocused");
-            isWindowFocused = false;
+            windowFocused = false;
         }
         @Override
         public void windowOpened(WindowEvent event) {

@@ -8,21 +8,21 @@ import listeners.HoldMouseListener;
 import listeners.ToggleKeyListener;
 import listeners.ToggleMouseListener;
 import model.AutoClickerConfiguration;
+import view.MainView;
 
 import java.awt.*;
 import java.util.EventListener;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static view.MainView.isWindowFocused;
-
 public class AutoClickerProcess {
     private EventListener eventListener;
+    private MainView mainView = MainView.getInstance();
     private boolean running = false;
     private boolean userViewing = false;
     private Runnable runner;
 
     public void start() {
-        if(isWindowFocused) {
+        if(mainView.isWindowFocused()) {
             running = false;
             return;
         }
