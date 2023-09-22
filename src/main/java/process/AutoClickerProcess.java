@@ -13,12 +13,19 @@ import java.awt.*;
 import java.util.EventListener;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static view.MainView.isWindowFocused;
+
 public class AutoClickerProcess {
     private EventListener eventListener;
     private boolean running = false;
+    private boolean userViewing = false;
     private Runnable runner;
 
     public void start() {
+        if(isWindowFocused) {
+            running = false;
+            return;
+        }
         if(running) {
             return;
         }
@@ -36,6 +43,14 @@ public class AutoClickerProcess {
             start();
         }
     }
+    public void toggleViewing() {
+        if(userViewing) {
+            userViewing = false;
+        } else {
+            userViewing = true;
+            stop();
+        }
+    }
     public void kill() {
         running = false;
         runner = null;
@@ -51,6 +66,7 @@ public class AutoClickerProcess {
         System.out.println("Killed process");
     }
     public void configure(AutoClickerConfiguration configuration) {
+        //TODO only process configuration if valid
         //First remove any existing event listener
         if(eventListener != null) {
             if(eventListener instanceof NativeKeyListener) {
