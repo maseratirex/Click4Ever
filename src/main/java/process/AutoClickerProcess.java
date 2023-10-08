@@ -1,6 +1,7 @@
 package process;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import listeners.HoldKeyListener;
@@ -8,18 +9,32 @@ import listeners.HoldMouseListener;
 import listeners.ToggleKeyListener;
 import listeners.ToggleMouseListener;
 import model.AutoClickerConfiguration;
+import model.MainModel;
 import view.MainView;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.EventListener;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AutoClickerProcess {
     private EventListener eventListener;
     private MainView mainView = MainView.getInstance();
+    private MainModel mainModel = MainModel.getInstance();
+    private AutoClickerConfiguration configuration;
     private boolean running = false;
     private boolean userViewing = false;
     private Runnable runner;
+
+    public AutoClickerProcess(AutoClickerConfiguration configuration) {
+        /**
+         * TODO Fix the Runners' speed issue on Mac
+         */
+        this.configuration = configuration;
+        updateInput();
+        updateOutput();
+    }
 
     public void start() {
         if(mainView.isWindowFocused()) {
@@ -65,8 +80,7 @@ public class AutoClickerProcess {
         }
         System.out.println("Killed process");
     }
-    public void configure(AutoClickerConfiguration configuration) {
-        //TODO only process configuration if valid
+    public void updateInput() {
         //First remove any existing event listener
         if(eventListener != null) {
             if(eventListener instanceof NativeKeyListener) {
@@ -82,7 +96,7 @@ public class AutoClickerProcess {
             if(configuration.getActivationType().equals(AutoClickerConfiguration.TYPE_HOLD)) {
                 eventListener = new HoldKeyListener(this, configuration.getInputCode());
                 GlobalScreen.addNativeKeyListener((NativeKeyListener) eventListener);
-                System.out.println("Added hold key listener for " + configuration.getInputCode());
+                System.out.println("Added hold key listener");
             } else if(configuration.getActivationType().equals(AutoClickerConfiguration.TYPE_TOGGLE)){
                 eventListener = new ToggleKeyListener(this, configuration.getInputCode());
                 GlobalScreen.addNativeKeyListener((NativeKeyListener) eventListener);
@@ -99,11 +113,15 @@ public class AutoClickerProcess {
                 System.out.println("Added toggle mouse listener");
             }
         }
-        //Now specify which output device to press: click mouse button or type key
+    }
+    public void updateOutput() {
+        //Specify which output device to press: click mouse button or type key
         if(configuration.getOutputDevice().equals(AutoClickerConfiguration.TYPE_MOUSE)) {
             runner = new MouseClickerRunner(configuration.getOutputCode(), configuration.getMinCPS(), configuration.getMaxCPS());
+            System.out.println("Set new MouseClickerRunner");
         } else if(configuration.getOutputDevice().equals(AutoClickerConfiguration.TYPE_KEYBOARD)) {
             runner = new KeyTyperRunner(configuration.getOutputCode(), configuration.getMinCPS(), configuration.getMaxCPS());
+            System.out.println("Set new KeyTyperRunner");
         }
     }
     private class MouseClickerRunner implements Runnable {
@@ -120,9 +138,8 @@ public class AutoClickerProcess {
         @Override
         public void run() {
             /**
-             * TODO test on Windows
-             * FIXME speed up on Mac
              * FIXME teleporting cursor issue on Mac
+             * FIXME overall execution speed per click on Mac
              */
             Robot robot;
             try {
@@ -131,11 +148,12 @@ public class AutoClickerProcess {
                 throw new RuntimeException(exc);
             }
             while(running) {
-                robot.mousePress(outputCode);
-                robot.mouseRelease(outputCode);
-                System.out.println("CLICKED");
+                int buttonMask = InputEvent.getMaskForButton(outputCode);
+                robot.mousePress(buttonMask);
+                robot.mouseRelease(buttonMask);
+                System.out.println("Clicked");
                 try {
-                    Thread.sleep(1000/ThreadLocalRandom.current().nextInt(minCPS, maxCPS));
+                    Thread.sleep(ThreadLocalRandom.current().nextInt(1000/maxCPS, 1000/minCPS + 1));
                 } catch (InterruptedException exc) {
                     throw new RuntimeException(exc);
                 }
@@ -164,9 +182,9 @@ public class AutoClickerProcess {
             while(running) {
                 robot.keyPress(outputCode);
                 robot.keyRelease(outputCode);
-                System.out.println("TYPED");
+                System.out.println("Typed");
                 try {
-                    Thread.sleep(1000/ ThreadLocalRandom.current().nextInt(minCPS, maxCPS));
+                    Thread.sleep(ThreadLocalRandom.current().nextInt(1000/maxCPS, 1000/minCPS + 1));
                 } catch (InterruptedException exc) {
                     throw new RuntimeException(exc);
                 }

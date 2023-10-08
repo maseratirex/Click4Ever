@@ -8,14 +8,13 @@ public class AutoClickerConfiguration implements Serializable {
     public static final String TYPE_HOLD = "Hold";
     public static final String TYPE_TOGGLE = "Toggle";
 
-    private final int inputCode; //mouse button code or key code
-    private final String inputDevice; //mouse/keyboard
-    private final int outputCode; //mouse button code or key code
-    private final String outputDevice; //mouse/keyboard
-    private final String activationType; //hold/toggle
-    private final int minCPS;
-
-    private final int maxCPS;
+    private int inputCode; //mouse button code or key code
+    private String inputDevice; //mouse/keyboard
+    private int outputCode; //mouse button code or key code
+    private String outputDevice; //mouse/keyboard
+    private String activationType; //hold/toggle
+    private int minCPS;
+    private int maxCPS;
 
     public AutoClickerConfiguration(int inputCode, String inputDevice, int outputCode, String outputDevice, String activationType, int minCPS, int maxCPS) {
         this.inputCode = inputCode;
@@ -53,5 +52,32 @@ public class AutoClickerConfiguration implements Serializable {
 
     public int getMaxCPS() {
         return maxCPS;
+    }
+
+    public void setInputCode(int inputCode) {
+        this.inputCode = inputCode;
+    }
+
+    public void setInputDevice(String inputDevice) {
+        this.inputDevice = inputDevice;
+    }
+
+    public void setOutputCode(int outputCode) {
+        this.outputCode = outputCode;
+    }
+
+    public void setOutputDevice(String outputDevice) {
+        this.outputDevice = outputDevice;
+    }
+    public void setActivationType(String activationType) {
+        this.activationType = activationType;
+    }
+
+    public void setMinCPS(int minCPS) {
+        this.minCPS = minCPS;
+    }
+
+    public void setMaxCPS(int maxCPS) {
+        this.maxCPS = maxCPS;
     }
 }

@@ -4,6 +4,8 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import process.AutoClickerProcess;
 
+import java.awt.event.KeyEvent;
+
 public class HoldKeyListener implements NativeKeyListener {
     private final AutoClickerProcess autoClickerProcess;
     private final int inputCode;
@@ -20,14 +22,14 @@ public class HoldKeyListener implements NativeKeyListener {
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
-        if(nativeEvent.getKeyCode() == inputCode) {
+        if(NativeKeyEvent.getKeyText(nativeEvent.getKeyCode()).equals(KeyEvent.getKeyText(inputCode))) {
             autoClickerProcess.start();
         }
     }
 
     @Override
     public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
-        if(nativeEvent.getKeyCode() == inputCode) {
+        if(NativeKeyEvent.getKeyText(nativeEvent.getKeyCode()).equals(KeyEvent.getKeyText(inputCode))) {
             autoClickerProcess.stop();
         }
     }

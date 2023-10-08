@@ -5,6 +5,7 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 public class MainModel {
@@ -30,6 +31,11 @@ public class MainModel {
     }
     public void saveConfigurations() {
         System.out.println("Saving configurations");
+        /**
+         * TODO update all configurations from the AutoClickerViews
+         *      as MainModel doesn't need to know the configuration
+         *      until it loads or saves it (it just needs the name)
+         */
         try {
             FileOutputStream fos = new FileOutputStream("src/main/resources/config.txt");
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -40,32 +46,31 @@ public class MainModel {
         }
     }
 
-    public boolean addConfiguration(String autoClickerName, AutoClickerConfiguration configuration) {
-        if(configurations.containsKey(autoClickerName)) return false;
+    public void addConfiguration(String autoClickerName, AutoClickerConfiguration configuration) {
         configurations.put(autoClickerName, configuration);
-        return true;
     }
     public void deleteConfiguration(String autoClickerName) {
-        configurations.remove(autoClickerName);
+        AutoClickerConfiguration configuration = configurations.remove(autoClickerName);
     }
     public void updateConfiguration(String autoClickerName, AutoClickerConfiguration configuration) {
+        AutoClickerConfiguration oldConfiguration = configurations.get(autoClickerName);
         configurations.put(autoClickerName, configuration);
-    }
-    public Set<String> getAutoClickerNames() {
-        return configurations.keySet();
     }
     public AutoClickerConfiguration getConfiguration(String autoClickerName) {
         return configurations.get(autoClickerName);
     }
-    public AutoClickerConfiguration getNullConfiguration() {
+    public AutoClickerConfiguration getDefaultConfiguration() {
         return new AutoClickerConfiguration(
-            NativeKeyEvent.VC_CLOSE_BRACKET,
+            KeyEvent.VK_OPEN_BRACKET,
             AutoClickerConfiguration.TYPE_KEYBOARD,
-            KeyEvent.VK_E,
+            KeyEvent.VK_CLOSE_BRACKET,
             AutoClickerConfiguration.TYPE_KEYBOARD,
             AutoClickerConfiguration.TYPE_HOLD,
-            200,
-            1000
+            10,
+            20
         );
+    }
+    public Set<String> getAutoClickerNames() {
+        return configurations.keySet();
     }
 }

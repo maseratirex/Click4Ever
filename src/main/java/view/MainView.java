@@ -10,10 +10,9 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class MainView {
-    private static MainView instance = new MainView();
+    private static final MainView instance = new MainView();
     private boolean windowFocused;
     private final MainModel mainModel = MainModel.getInstance();
-;
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private MainView() {}
     public static MainView getInstance() {
@@ -39,12 +38,15 @@ public class MainView {
 
         //Menu bar for add and delete Auto Clickers
         JMenuBar menuBar = new JMenuBar();
+        menuBar.setLayout(new BorderLayout());
         JButton addNewAutoClickerButton = new JButton("Add new auto clicker");
+        addNewAutoClickerButton.setFocusPainted(false);
         addNewAutoClickerButton.addActionListener(new AddNewAutoClickerListener());
         JButton deleteAutoClickerButton = new JButton("Delete auto clicker");
+        deleteAutoClickerButton.setFocusPainted(false);
         deleteAutoClickerButton.addActionListener(new DeleteAutoClickerListener());
-        menuBar.add(addNewAutoClickerButton);
-        menuBar.add(deleteAutoClickerButton);
+        menuBar.add(addNewAutoClickerButton, BorderLayout.LINE_START);
+        menuBar.add(deleteAutoClickerButton, BorderLayout.LINE_END);
         window.setJMenuBar(menuBar);
 
         //Display the window.
@@ -69,10 +71,10 @@ public class MainView {
                     return;
                 }
             }
-            AutoClickerConfiguration nullConfiguration = mainModel.getNullConfiguration();
-            mainModel.addConfiguration(autoClickerName, nullConfiguration);
+            AutoClickerConfiguration defaultConfiguration = mainModel.getDefaultConfiguration();
+            mainModel.addConfiguration(autoClickerName, defaultConfiguration);
             System.out.println("Added Auto Clicker configuration");
-            tabbedPane.addTab(autoClickerName, new AutoClickerView(nullConfiguration));
+            tabbedPane.addTab(autoClickerName, new AutoClickerView(defaultConfiguration));
             System.out.println("Added Auto Clicker view");
         }
     }
@@ -108,13 +110,13 @@ public class MainView {
     private class MainWindowListener extends WindowAdapter {
         @Override
         public void windowGainedFocus(WindowEvent e) {
-            System.out.println("Window focused");
+            System.out.println("Window focused. Paused clicking");
             windowFocused = true;
         }
 
         @Override
         public void windowLostFocus(WindowEvent e) {
-            System.out.println("Window unfocused");
+            System.out.println("Window unfocused. Resumed clicking");
             windowFocused = false;
         }
         @Override
