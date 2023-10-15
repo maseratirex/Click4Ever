@@ -11,7 +11,7 @@ Create, run, and save multiple auto clickers on both Mac and Windows
      * Tap once to activate and tap again to deactivate
 
 ## Download
-Click on "Version 1.0.0 Release" to the right. When running on Mac, enable the application to control the computer using accessibility features and restart the application after doing so
+Click on "Version 1.0.0 Release" to the right and download the Click4Ever JAR. Requires a [JDK of 17 or later](https://www.oracle.com/java/technologies/downloads/) to run. When running on Mac, enable the application to control the computer using accessibility features and restart the application after doing so
 
 ## Screenshots
 <img src="https://github.com/maseratirex/Click4Ever/assets/88254697/8ac76484-7ac8-4542-9e7a-f61de1517d21" width="400" height="400">
